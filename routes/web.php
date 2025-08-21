@@ -3,8 +3,12 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataImportController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectImportController;
 use App\Http\Controllers\ProjectStatusController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TeamMemberController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -46,10 +50,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Project Import temporarily disabled due to compatibility issues
-
     // Projects (resource route va después)
     Route::resource('projects', ProjectController::class);
+    Route::get('/projects/{project}/export', [ProjectController::class, 'export'])->name('projects.export');
+
+    // Project Import from Excel
+    Route::get('/projects-import', [ProjectImportController::class, 'create'])->name('projects.import.create');
+    Route::post('/projects-import', [ProjectImportController::class, 'store'])->name('projects.import.store');
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/reports/export-by-status', [ReportController::class, 'exportByStatus'])->name('reports.export-by-status');
+    Route::get('/reports/{status}', [ReportController::class, 'showByStatus'])->name('reports.show-by-status');
 
     // Data Import (legacy - for existing project data)
     Route::get('/projects/{project}/import', [DataImportController::class, 'create'])->name('data-import.create');
@@ -67,4 +79,8 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/projects/{project}/status/production', [ProjectStatusController::class, 'showProduction'])->name('projects.status.production');
     Route::post('/projects/{project}/status/production', [ProjectStatusController::class, 'updateToProduction'])->name('projects.status.update-production');
+
+    // Team Management
+    Route::resource('departments', DepartmentController::class);
+    Route::resource('team-members', TeamMemberController::class);
 });

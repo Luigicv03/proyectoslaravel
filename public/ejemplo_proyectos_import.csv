@@ -1,0 +1,9 @@
+ID,Identificador,Nombre,Descripción
+1,PROJ-001,Sistema de Gestión de Usuarios,Sistema para administrar usuarios y permisos de la empresa
+2,PROJ-002,Portal Web Corporativo,Portal web principal para la empresa con información corporativa
+3,PROJ-003,Aplicación Móvil Clientes,App móvil para que los clientes accedan a servicios
+4,PROJ-004,Sistema de Facturación,Sistema automatizado para generar y gestionar facturas
+5,PROJ-005,Plataforma E-commerce,Plataforma completa para ventas en línea
+6,PROJ-006,Sistema de Reportes,Generación automática de reportes y estadísticas
+7,PROJ-007,App de Gestión Interna,Aplicación para gestión interna de empleados
+8,PROJ-008,Portal de Proveedores,Portal web para que los proveedores gestionen sus servicios

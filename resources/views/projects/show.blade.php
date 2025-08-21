@@ -25,18 +25,389 @@
                     </div>
                 </div>
                 <div class="flex space-x-3">
-                    <a href="{{ route('data-import.create', $project) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                        Importar Avance
+                    <a href="{{ route('projects.export', $project) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Exportar Proyecto
                     </a>
                     <a href="{{ route('projects.edit', $project) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Editar
                     </a>
+                    <form action="{{ route('projects.destroy', $project) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este proyecto? Esta acción no se puede deshacer.')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Eliminar
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Project Status Management -->
+    <!-- INFORMACIÓN COMPLETA DEL PROYECTO -->
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">📋 Información Completa del Proyecto</h2>
+            
+            <!-- INFORMACIÓN BÁSICA -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">🏷️ Información Básica</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Nombre del Proyecto:</span>
+                        <p class="text-gray-900 font-semibold">{{ $project->name }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Formato:</span>
+                        <p class="text-gray-900">{{ $project->format->name }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Código del Proyecto:</span>
+                        <p class="text-gray-900">{{ $project->project_code ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Tipo de Proyecto:</span>
+                        <p class="text-gray-900">{{ $project->project_type ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Identificador:</span>
+                        <p class="text-gray-900">{{ $project->project_identifier ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Estado:</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            @if($project->status === 'reciente') bg-gray-100 text-gray-800
+                            @elseif($project->status === 'pendiente_activar') bg-yellow-100 text-yellow-800
+                            @elseif($project->status === 'documento_devuelto') bg-red-100 text-red-800
+                            @elseif($project->status === 'desarrollo') bg-blue-100 text-blue-800
+                            @elseif($project->status === 'produccion') bg-green-100 text-green-800
+                            @endif">
+                            {{ $project->status_display }}
+                        </span>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Progreso:</span>
+                        <div class="flex items-center mt-1">
+                            <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
+                                <div class="h-2 rounded-full bg-blue-600" style="width: {{ $project->progress_percentage }}%"></div>
+                            </div>
+                            <span class="text-sm text-gray-600">{{ $project->progress_percentage }}%</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-gray-500">Prioridad:</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            @if($project->priority === 'alta') bg-red-100 text-red-800
+                            @elseif($project->priority === 'media') bg-yellow-100 text-yellow-800
+                            @else bg-green-100 text-green-800
+                            @endif">
+                            {{ ucfirst($project->priority) }}
+                        </span>
+                    </div>
+                </div>
+                @if($project->description)
+                <div class="mt-4 bg-gray-50 p-4 rounded-lg">
+                    <span class="text-sm font-medium text-gray-500">Descripción:</span>
+                    <p class="text-gray-900 mt-1">{{ $project->description }}</p>
+                </div>
+                @endif
+            </div>
+
+            <!-- FECHAS IMPORTANTES -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">📅 Fechas Importantes</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-blue-600">Fecha de Solicitud:</span>
+                        <p class="text-blue-900 font-semibold">{{ $project->request_date ? $project->request_date->format('d/m/Y') : 'No especificada' }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-blue-600">Fecha de Recepción:</span>
+                        <p class="text-blue-900 font-semibold">{{ $project->reception_date ? $project->reception_date->format('d/m/Y') : 'No especificada' }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-blue-600">Certificación de Desarrollo:</span>
+                        <p class="text-blue-900 font-semibold">{{ $project->development_certification_date ? $project->development_certification_date->format('d/m/Y') : 'No especificada' }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-blue-600">Fecha Tentativa de Producción:</span>
+                        <p class="text-blue-900 font-semibold">{{ $project->tentative_production_date ? $project->tentative_production_date->format('d/m/Y') : 'No especificada' }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-blue-600">Fecha de Salida a Producción:</span>
+                        <p class="text-blue-900 font-semibold">{{ $project->production_release_date ? $project->production_release_date->format('d/m/Y') : 'No especificada' }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-blue-600">Fecha de Compromiso Obligatorio:</span>
+                        <p class="text-blue-900 font-semibold">{{ $project->mandatory_commitment_date ? $project->mandatory_commitment_date->format('d/m/Y') : 'No especificada' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UNIDADES SOLICITANTE Y DESTINATARIA -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">🏢 Unidades Organizacionales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800 mb-3">📤 Unidad Solicitante</h4>
+                        <div class="space-y-2">
+                            <div>
+                                <span class="text-sm font-medium text-green-600">Dirección General:</span>
+                                <p class="text-green-900">{{ $project->soliciting_direction_general ?: 'No especificada' }}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-green-600">Línea de Gestión:</span>
+                                <p class="text-green-900">{{ $project->soliciting_line_management ?: 'No especificada' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-purple-800 mb-3">📥 Unidad Destinataria</h4>
+                        <div class="space-y-2">
+                            <div>
+                                <span class="text-sm font-medium text-purple-600">Dirección General:</span>
+                                <p class="text-purple-900">{{ $project->destination_direction_general ?: 'No especificada' }}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-purple-600">Línea de Gestión:</span>
+                                <p class="text-purple-900">{{ $project->destination_line_management ?: 'No especificada' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                        </div>
+
+            <!-- TIPO DE REGULACIÓN -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">📜 Tipo de Regulación</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->regulation_organizational ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-orange-800">Regulación Organizacional</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->regulation_operational ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-orange-800">Regulación Operacional</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->regulation_audit_internal ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-orange-800">Auditoría Interna</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->regulation_audit_external ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-orange-800">Auditoría Externa</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->regulation_service ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-orange-800">Regulación de Servicio</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->regulation_technical ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-orange-800">Regulación Técnica</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->regulation_mandatory ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-orange-800">Regulación Obligatoria</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RANGO SUB-LEGAL -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">📋 Rango Sub-Legal</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->sublegal_circular_official ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-yellow-800">Circular Oficial Sub-Legal</span>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->sublegal_official_gazette ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-yellow-800">Gaceta Oficial Sub-Legal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VINCULACIÓN CON PLAN FINANCIERO -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">💰 Vinculación con Plan Financiero</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->financial_plan_operational_efficiency ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-green-800">Eficiencia Operacional</span>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->financial_plan_financial_stability ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-green-800">Estabilidad Financiera</span>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->financial_plan_customer_solution ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-green-800">Solución al Cliente</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMPACTO A NIVEL DE ATENCIÓN -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">🎯 Impacto a Nivel de Atención</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->impact_business_high ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-red-800">Alto Impacto en Negocio</span>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->impact_operational_medium ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-blue-800">Medio Impacto Operacional</span>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->impact_technological_medium ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-blue-800">Medio Impacto Tecnológico</span>
+                        </div>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->impact_financial_high ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-red-800">Alto Impacto Financiero</span>
+                        </div>
+                    </div>
+                </div>
+                @if($project->impacted_system)
+                <div class="mt-4 bg-gray-50 p-4 rounded-lg">
+                    <span class="text-sm font-medium text-gray-600">Sistema Impactado:</span>
+                    <p class="text-gray-900 mt-1">{{ $project->impacted_system }}</p>
+                </div>
+                @endif
+            </div>
+
+            <!-- LIDERAZGO Y CALIDAD -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">👥 Liderazgo y Calidad</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-indigo-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-indigo-600">Líder del Proyecto:</span>
+                        <p class="text-indigo-900 font-semibold">{{ $project->project_leader ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" {{ $project->quality_environment ? 'checked' : '' }} disabled class="mr-2">
+                            <span class="text-sm font-medium text-indigo-800">Ambiente de Calidad</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JUSTIFICACIÓN -->
+            @if($project->justification)
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">📝 Justificación</h3>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-900">{{ $project->justification }}</p>
+                </div>
+            </div>
+            @endif
+
+            <!-- ELABORADO POR -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">✍️ Elaborado Por</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-teal-600">Nombre:</span>
+                        <p class="text-teal-900">{{ $project->prepared_by_name ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-teal-600">Cargo:</span>
+                        <p class="text-teal-900">{{ $project->prepared_by_position ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-teal-600">Extensión:</span>
+                        <p class="text-teal-900">{{ $project->prepared_by_extension ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-teal-600">Firma:</span>
+                        <p class="text-teal-900">{{ $project->prepared_by_signature ?: 'No especificado' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUTORIZADO POR -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">✅ Autorizado Por</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-emerald-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-emerald-600">Nombre:</span>
+                        <p class="text-emerald-900">{{ $project->authorized_by_name ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-emerald-600">Cargo:</span>
+                        <p class="text-emerald-900">{{ $project->authorized_by_position ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-emerald-600">Firma:</span>
+                        <p class="text-emerald-900">{{ $project->authorized_by_signature ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-emerald-600">Sello:</span>
+                        <p class="text-emerald-900">{{ $project->authorized_by_seal ?: 'No especificado' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECIBIDO POR -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">📥 Recibido Por</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-cyan-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-cyan-600">Recibido Por:</span>
+                        <p class="text-cyan-900">{{ $project->received_by ?: 'No especificado' }}</p>
+                    </div>
+                    <div class="bg-cyan-50 p-4 rounded-lg">
+                        <span class="text-sm font-medium text-cyan-600">Firma y Sello:</span>
+                        <p class="text-cyan-900">{{ $project->received_signature_seal ?: 'No especificado' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OBSERVACIONES -->
+            @if($project->observation)
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">📋 Observaciones</h3>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-900">{{ $project->observation }}</p>
+                </div>
+            </div>
+            @endif
+
+            <!-- Project Status Management -->
     <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Gestión de Estados del Proyecto</h3>
