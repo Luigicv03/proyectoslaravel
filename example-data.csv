@@ -1,0 +1,13 @@
+task_identifier,task_name,environment,progress_percentage,start_date,estimated_end_date
+TASK-001,Desarrollo de sistema de autenticación,Desarrollo,85,2024-01-01,2024-01-15
+TASK-002,Implementación de dashboard principal,Desarrollo,60,2024-01-05,2024-01-20
+TASK-003,Pruebas unitarias del módulo de usuarios,Calidad,100,2024-01-10,2024-01-12
+TASK-004,Configuración de base de datos,Desarrollo,100,2024-01-01,2024-01-03
+TASK-005,Desarrollo de API REST,Desarrollo,75,2024-01-08,2024-01-18
+TASK-006,Pruebas de integración,Calidad,40,2024-01-15,2024-01-25
+TASK-007,Despliegue en ambiente de producción,Producción,0,2024-01-20,2024-01-22
+TASK-008,Documentación técnica,Desarrollo,90,2024-01-12,2024-01-16
+TASK-009,Optimización de consultas SQL,Desarrollo,70,2024-01-10,2024-01-17
+TASK-010,Pruebas de carga,Calidad,0,2024-01-18,2024-01-20
+TASK-011,Configuración de monitoreo,Producción,0,2024-01-22,2024-01-24
+TASK-012,Capacitación del equipo,Desarrollo,100,2024-01-14,2024-01-14
